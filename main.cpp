@@ -51,6 +51,17 @@ public:
         }
     }
 
+    void Sorting(vector<int> &arr)
+    {
+        vector<unordered_set<int>> test = neighbour_sets;
+        sort(arr.begin(), arr.end(), [test](const int &x, const int &y) {
+            return test[x].size() < test[y].size();
+        });
+        cout << test[arr[0]].size();
+        int x;
+        cin >> x;
+    }
+
     void FindClique(int randomization, int iterations)
     {
         static mt19937 generator;
@@ -61,9 +72,11 @@ public:
             for (int i = 0; i < neighbour_sets.size(); ++i)
             {
                 candidates[i] = i;
+
             }
+            Sorting(candidates);
             shuffle(candidates.begin(), candidates.end(), generator);
-            while (! candidates.empty())
+            while (!candidates.empty())
             {
                 int last = candidates.size() - 1;
                 int rnd = GetRandom(0, min(randomization - 1, last));
@@ -129,7 +142,7 @@ int main()
     cout << "Randomization: ";
     cin >> randomization;
 
-    string files_root_folder = "";
+    string files_root_folder = "src/";
 
     vector<string> files = { 
         "brock200_1.clq",
