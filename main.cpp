@@ -53,13 +53,50 @@ public:
 
     void Sorting(vector<int> &arr)
     {
-        vector<unordered_set<int>> test = neighbour_sets;
+        vector<unordered_set<int>> test(neighbour_sets.size());
+        copy(begin(neighbour_sets), end(neighbour_sets), begin(test));
         sort(arr.begin(), arr.end(), [test](const int &x, const int &y) {
             return test[x].size() < test[y].size();
         });
-        cout << test[arr[0]].size();
-        int x;
-        cin >> x;
+        vector<int> colors_arr(arr.size(), -1);
+        colors_arr[arr[0]] = 0;
+        for (size_t i = 1; i < arr.size(); ++i)
+        {
+            int color = 0;
+            unordered_set<int> colors;
+            for (const auto &elem : neighbour_sets[arr[i]])
+            {
+                colors.insert(colors_arr[elem]);
+            }   
+            for (size_t j = 0; j < arr.size(); ++j)
+            {
+                if (colors.find(color) != colors.end())
+                {
+                    color++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            colors_arr[arr[i]] = color;
+        }
+
+        sort(arr.begin(), arr.end(), [colors_arr](const int &x, const int &y) {
+            return colors_arr[x] > colors_arr[y];
+        });
+
+        for (const auto &e : colors_arr)
+        {
+            cout << e << " ";
+        }
+        cout << endl;
+
+        for (const auto &e : arr)
+        {
+            cout << e << " ";
+        }
+        cout << endl;
     }
 
     void FindClique(int randomization, int iterations)
@@ -72,19 +109,27 @@ public:
             for (int i = 0; i < neighbour_sets.size(); ++i)
             {
                 candidates[i] = i;
-
             }
             Sorting(candidates);
-            shuffle(candidates.begin(), candidates.end(), generator);
+            // shuffle(candidates.begin(), candidates.end(), generator);
             while (!candidates.empty())
             {
                 int last = candidates.size() - 1;
-                int rnd = GetRandom(0, min(randomization - 1, last));
-                int vertex = candidates[rnd];
+                // int rnd = GetRandom(0, min(randomization - 1, last));
+                // int vertex = candidates[rnd];
+                int vertex = candidates[0];
                 clique.push_back(vertex);
-                for (int c = 0; c < candidates.size(); ++c)
+                for (int c = 1; c < candidates.size(); ++c)
                 {
+                    // last = candidates.size() - 1;
                     int candidate = candidates[c];
+                    // cout << neighbour_sets[vertex].count(candidate) << " ";
+                    cout << "Vertex: " << vertex << " Candidate: " << candidate << endl;
+                    for (const auto &e : neighbour_sets[vertex])
+                    {
+                        cout << e << " ";
+                    }
+                    cout << "Count: " << neighbour_sets[vertex].count(candidate) << endl;
                     if (neighbour_sets[vertex].count(candidate) == 0)
                     {
                         // Move the candidate to the end and pop it
@@ -92,8 +137,15 @@ public:
                         candidates.pop_back();
                         --c;
                     }
+                    cout << "Candidates: ";
+                    for (const auto &e : candidates)
+                    {
+                        cout << e << " ";
+                    }
+                    cout << endl;
                 }
-                shuffle(candidates.begin(), candidates.end(), generator);
+                Sorting(candidates);
+                // shuffle(candidates.begin(), candidates.end(), generator);
             }
             if (clique.size() > best_clique.size())
             {
@@ -144,32 +196,35 @@ int main()
 
     string files_root_folder = "src/";
 
-    vector<string> files = { 
-        "brock200_1.clq",
-        "brock200_2.clq",
-        "brock200_3.clq",
-        "brock200_4.clq",
-        "brock400_1.clq",
-        "brock400_2.clq",
-        "brock400_3.clq",
-        "brock400_4.clq",
-        "C125.9.clq",
-        "gen200_p0.9_44.clq",
-        "gen200_p0.9_55.clq",
-        "hamming8-4.clq",
-        "johnson16-2-4.clq",
-        "johnson8-2-4.clq",
-        "keller4.clq",
-        "MANN_a27.clq",
-        "MANN_a9.clq",
-        "p_hat1000-1.clq",
-        "p_hat1000-2.clq",
-        "p_hat1500-1.clq",
-        "p_hat300-3.clq",
-        "p_hat500-3.clq",
-        "san1000.clq",
-        "sanr200_0.9.clq",
-        "sanr400_0.7.clq"
+    // vector<string> files = { 
+    //     "brock200_1.clq",
+    //     "brock200_2.clq",
+    //     "brock200_3.clq",
+    //     "brock200_4.clq",
+    //     "brock400_1.clq",
+    //     "brock400_2.clq",
+    //     "brock400_3.clq",
+    //     "brock400_4.clq",
+    //     "C125.9.clq",
+    //     "gen200_p0.9_44.clq",
+    //     "gen200_p0.9_55.clq",
+    //     "hamming8-4.clq",
+    //     "johnson16-2-4.clq",
+    //     "johnson8-2-4.clq",
+    //     "keller4.clq",
+    //     "MANN_a27.clq",
+    //     "MANN_a9.clq",
+    //     "p_hat1000-1.clq",
+    //     "p_hat1000-2.clq",
+    //     "p_hat1500-1.clq",
+    //     "p_hat300-3.clq",
+    //     "p_hat500-3.clq",
+    //     "san1000.clq",
+    //     "sanr200_0.9.clq",
+    //     "sanr400_0.7.clq"
+    // };
+    vector<string> files = {
+        "helios.clq"
     };
     ofstream fout("clique.csv");
     fout << "File; Clique; Time (sec)\n";
