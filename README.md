@@ -2,4 +2,4 @@
 
 ---
 
-Greedy randomized heuristics for the maximum clique problem
+Tabu heuristics for the maximum clique problem
